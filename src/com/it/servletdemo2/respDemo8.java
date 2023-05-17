@@ -1,5 +1,6 @@
 package com.it.servletdemo2;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -10,21 +11,23 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@WebServlet("/respDemo4")
-public class respDemo4 extends HttpServlet {
+@WebServlet("/respDemo8")
+public class respDemo8 extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //
-        String news = "这是个新闻";
+        String realPath = getServletContext().getRealPath("/img/a.jpg");
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(realPath));
+        resp.setHeader("Content-Type", "application/octet-stream");
+        resp.setHeader("Content-Disposition", "attachment;filename=a.jpg");
+        ServletOutputStream os = resp.getOutputStream();
 
-        //设置缓存一小时
-        resp.setDateHeader("Expires", System.currentTimeMillis() + 3600000);
-
-        resp.setContentType("text/html;charset=UTF-8");
-
-        resp.getWriter().write(news);
-
-        System.out.println("aaa");
+        byte[] arr = new byte[1024];
+        int len;
+        while ((len = bis.read(arr)) != -1) {
+            os.write(arr, 0, len);
+        }
+        bis.close();
     }
 
     @Override
